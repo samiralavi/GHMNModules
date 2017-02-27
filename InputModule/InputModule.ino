@@ -1,6 +1,7 @@
 #include <UIPEthernet.h>
 #include <Modbus.h>
 #include <ModbusIP.h>
+#include <avr/wdt.h>
 
 const int PINMUX1 = 7;
 const int PINMUX2 = 6;
@@ -33,11 +34,12 @@ const int CurrentSensor3 = 4021;
 ModbusIP mb;
 
 void setup() {
-  
+
+  wdt_enable(WDTO_2S);
   analogReference(EXTERNAL);
   // The media access control (ethernet hardware) address for the shield
-   byte mac[] = { 0xB4, 0x68, 0xA8, 0x48, 0xB7, 0x80};
-//  byte ip[] = { 192, 168, 137, 10 };
+  byte mac[] = { 0xB4, 0x68, 0xA8, 0x48, 0xB7, 0x80};
+  //  byte ip[] = { 192, 168, 137, 10 };
 
   //Config Modbus IP
   mb.config(mac);
@@ -46,17 +48,17 @@ void setup() {
   pinMode(PINMUX1, OUTPUT);
   pinMode(PINMUX2, OUTPUT);
   pinMode(PINMUX3, OUTPUT);
-  
+
   //Set DI pin input
   pinMode(DIPIN, INPUT);
 
   // Add Digital Input registers - Use addIsts() for digital inputs
-  mb.addIsts(DI1,false);
-  mb.addIsts(DI2,false);
-  mb.addIsts(DI3,false);
-  mb.addIsts(DI4,false);
-//  mb.addIsts(DI5,false);
-//  mb.addIsts(DI6,false);
+  mb.addIsts(DI1, false);
+  mb.addIsts(DI2, false);
+  mb.addIsts(DI3, false);
+  mb.addIsts(DI4, false);
+  //  mb.addIsts(DI5,false);
+  //  mb.addIsts(DI6,false);
 
   // Add analog registers - Use addIreg() for analog Inputs
   mb.addIreg(PT1);
@@ -77,6 +79,7 @@ void setup() {
 
 }
 void loop() {
+  wdt_reset();
   //Ethernet.maintain();
   //Call once inside loop() - all magic here
   mb.task();
@@ -85,62 +88,87 @@ void loop() {
   digitalWrite(PINMUX1, LOW);
   digitalWrite(PINMUX2, LOW);
   digitalWrite(PINMUX3, LOW);
-  delay(1);
+
+  mb.task();
+
   mb.Ists(DI1, digitalRead(DIPIN));
   mb.Ireg(PT2, analogRead(A0));
 
   digitalWrite(PINMUX1, HIGH);
   digitalWrite(PINMUX2, LOW);
   digitalWrite(PINMUX3, LOW);
-  delay(1);
+
+  mb.task();
+
   mb.Ists(DI4, digitalRead(DIPIN));
   mb.Ireg(PT3, analogRead(A0));
 
   digitalWrite(PINMUX1, LOW);
   digitalWrite(PINMUX2, HIGH);
   digitalWrite(PINMUX3, LOW);
-  delay(1);
-//  mb.Ists(DI5, digitalRead(DIPIN));
+
+  mb.task();
+  //  mb.Ists(DI5, digitalRead(DIPIN));
   mb.Ireg(PT4, analogRead(A0));
 
   digitalWrite(PINMUX1, HIGH);
   digitalWrite(PINMUX2, HIGH);
   digitalWrite(PINMUX3, LOW);
-  delay(1);
-//  mb.Ists(DI6, digitalRead(DIPIN));
+
+  mb.task();
+  //  mb.Ists(DI6, digitalRead(DIPIN));
   mb.Ireg(PT1, analogRead(A0));
 
   digitalWrite(PINMUX1, LOW);
   digitalWrite(PINMUX2, LOW);
   digitalWrite(PINMUX3, HIGH);
-  delay(1);
+
+  mb.task();
+
   mb.Ists(DI2, digitalRead(DIPIN));
   mb.Ireg(PT8, analogRead(A0));
 
   digitalWrite(PINMUX1, HIGH);
   digitalWrite(PINMUX2, LOW);
   digitalWrite(PINMUX3, HIGH);
-  delay(1);
+
+  mb.task();
+
   mb.Ists(DI3, digitalRead(DIPIN));
   mb.Ireg(PT5, analogRead(A0));
 
-  
+
   digitalWrite(PINMUX1, LOW);
   digitalWrite(PINMUX2, HIGH);
   digitalWrite(PINMUX3, HIGH);
-  delay(1);
+
+  mb.task();
+
   mb.Ireg(PT7, analogRead(A0));
 
   digitalWrite(PINMUX1, HIGH);
   digitalWrite(PINMUX2, HIGH);
   digitalWrite(PINMUX3, HIGH);
-  delay(1);
+
+  mb.task();
+
   mb.Ireg(PT6, analogRead(A0));
-  
+
+  mb.task();
+
   mb.Ireg(PT9, analogRead(A2));
-  mb.Ireg(PT10,analogRead(A1));
+
+  mb.task();
+
+  mb.Ireg(PT10, analogRead(A1));
 
   mb.Ireg(CurrentSensor1, analogRead(A3));
+
+  mb.task();
+
   mb.Ireg(CurrentSensor2, analogRead(A4));
+
+  mb.task();
+
   mb.Ireg(CurrentSensor3, analogRead(A5));
 }

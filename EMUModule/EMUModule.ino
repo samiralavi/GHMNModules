@@ -1,6 +1,7 @@
 #include <UIPEthernet.h>
 #include <Modbus.h>
 #include <ModbusIP.h>
+#include <avr/wdt.h>
 
 //Modbus Registers Offsets (0-9999)
 
@@ -25,6 +26,7 @@ int getVPP(int analogpin)
   uint32_t start_time = millis();
   while ((millis() - start_time) < 20) //sample for 1 Sec
   {
+    mb.task();
     readValue = analogRead(analogpin);
     // see if you have a new maxValue
     if (readValue > maxValue)
@@ -47,6 +49,7 @@ int getVPP(int analogpin)
 
 void setup() {
 
+  wdt_enable(WDTO_2S);
 //  analogReference(INTERNAL);
   // The media access control (ethernet hardware) address for the shield
   byte mac[] = { 0xB4, 0x68, 0xA8, 0x43, 0x35, 0x54 };
@@ -72,7 +75,8 @@ int VRMS = 0;
 int AmpsRMS = 0;
 
 void loop() {
-  //  Ethernet.maintain();
+//    Ethernet.maintain();
+  wdt_reset();
   //Call once inside loop() - all magic here
   mb.task();
 
@@ -80,19 +84,19 @@ void loop() {
   AmpsRMS = (Current) /2 * 0.707;
   mb.Ireg(CT1, AmpsRMS);
 
-//  mb.task();
+  mb.task();
 
   Current = getVPP(A1);
   AmpsRMS = (Current) /2 * 0.707;
   mb.Ireg(CT2, AmpsRMS);
 
-//  mb.task();
+  mb.task();
 
   Current = getVPP(A2);
   AmpsRMS = (Current) /2 * 0.707;
   mb.Ireg(CT3, AmpsRMS);
 
-//  mb.task();
+  mb.task();
 
   Voltage = getVPP(A3);
   VRMS = (Voltage) * 0.707;
@@ -104,7 +108,7 @@ void loop() {
   VRMS = (Voltage) * 0.707;
   mb.Ireg(VT2, VRMS);
 
-//  mb.task();
+  mb.task();
 
   Voltage = getVPP(A5);
   VRMS = (Voltage) * 0.707;

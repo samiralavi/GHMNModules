@@ -1,6 +1,7 @@
 #include <UIPEthernet.h>
 #include <ModbusIP.h>
 #include <Modbus.h>
+#include <avr/wdt.h>
 
 const int PINMUX1 = 7;
 const int PINMUX2 = 6;
@@ -44,9 +45,10 @@ const int PINCOIL10 = 0;
 ModbusIP mb;
 
 void setup() {
+  wdt_enable(WDTO_2S);
   // The media access control (ethernet hardware) address for the shield
-    byte mac[] = { 0xB4, 0x68, 0xA8, 0x8A, 0x9A, 0x61};
-        
+  byte mac[] = { 0xB4, 0x68, 0xA8, 0x72, 0x4B, 0x3F};
+
   //Config Modbus IP
   mb.config(mac);
 
@@ -95,7 +97,8 @@ void setup() {
 }
 
 void loop() {
-//  Ethernet.maintain();
+  wdt_reset();
+  //  Ethernet.maintain();
   //Call once inside loop() - all magic here
   mb.task();
 
