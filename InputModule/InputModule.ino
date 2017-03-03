@@ -38,7 +38,7 @@ void setup() {
   wdt_enable(WDTO_2S);
   analogReference(EXTERNAL);
   // The media access control (ethernet hardware) address for the shield
-  byte mac[] = { 0xB4, 0x68, 0xA8, 0x48, 0xB7, 0x80};
+  byte mac[] = { 0xB4, 0x68, 0xA8, 0x7B, 0x6F, 0x27};
   //  byte ip[] = { 192, 168, 137, 10 };
 
   //Config Modbus IP
